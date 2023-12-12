@@ -22,12 +22,18 @@ def play(level):
     return result
 
 
+# The get_money_interval function will calculate an interval of possible values
+# in ILS that the player needs to guess within.
+# The size of this interval is influenced by the game's difficulty level
 def get_money_interval(level, generated, converter):
     exchanged = round(converter.convert(generated, 'USD', 'ILS'))
     interval = range(exchanged - level, exchanged + level + 1)
     return interval
 
 
+# The function prompts the user to guess the amount of money in USD
+# which is then converted to ILS using the converter. Final User's guess returned will be in ILS
+# and it will be compared to the valid_money_interval range also which is also in the converted ILS.
 def get_guess_from_user(prompt, valid_choices, converter):
     while True:
         choice = input(prompt)
@@ -41,5 +47,6 @@ def get_guess_from_user(prompt, valid_choices, converter):
             print(f"Illegal Input! Please enter a valid Integer number for the {valid_choices} choice.")
 
 
+# An interval of possible values in ILS is compared against a user_guess in ILS
 def compare_results(user_guess, range_options):
     return True if user_guess in list(range_options) else False

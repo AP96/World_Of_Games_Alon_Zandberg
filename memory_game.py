@@ -11,6 +11,11 @@ def welcome():
     print(WELCOME_PROMPT)
 
 
+# Initiates the game with a given difficulty level
+# generates a sequence of numbers
+# and prompts the user to remember and input the sequence.
+# Determines win/loss based on user input.
+
 def play(level):
     welcome()
     sequence = generate_sequence(level)

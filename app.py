@@ -1,3 +1,4 @@
+# This module orchestrates the game-playing experience
 # Constants
 import currency_roulette_game
 import guess_game
@@ -51,6 +52,7 @@ def play(game, level):
         result = currency_roulette_game.play(level)
     if result == 'Won':
         score.add_score(level)
+
 
 def get_user_choice(prompt, valid_choices, mode):
     while True:

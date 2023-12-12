@@ -1,0 +1,27 @@
+version: '3.8'
+
+# This docker-compose.yml file defines a single service for a Flask web application,
+# detailing how the Docker image for this service should be built and run.
+# It includes configurations for building the Docker image, setting up port mappings for web access,
+# persisting data using a bind mount volume, setting environment variables for Flask,
+# and ensuring container resilience through a restart policy.
+
+# The Docker Compose file itself does not directly define the Flask application.
+# Instead, it specifies how to build and run the Docker container that contains your Flask application.
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image:  az_worldofgames_level4:latest
+    container_name: wog_web_app
+    ports:
+      - "5000:5000"
+    volumes:
+      - type: bind
+        source: ./scores.txt
+        target: /app/scores.txt
+    environment:
+      - FLASK_ENV=development
+    restart: on-failure #Restart Policy

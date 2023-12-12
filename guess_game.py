@@ -23,7 +23,7 @@ def generate_number(level):
 
 
 def get_guess_from_user(level):
-    guess = app.get_user_choice(f'Please select a difficulty level between 0 and {level}: ', list(range(0, level + 1)),
+    guess = app.get_user_choice(f'Please guess a number between 0 and {level}: ', list(range(0, level + 1)),
                                 "Difficulty level")
     return guess
 
