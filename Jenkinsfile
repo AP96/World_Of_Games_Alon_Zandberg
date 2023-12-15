@@ -42,33 +42,36 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                try {
-                    sh 'python e2e.py'
-                } catch(Exception e) {
-                    error "Tests failed: ${e.message}"
-                }
+                    try {
+                        sh 'python e2e.py'
+                    } catch(Exception e) {
+                        error "Tests failed: ${e.message}"
+                    }
                 }
             }
         }
+    }
 
-        post {
-            always {
-                script {
+    post {
+        always {
+            script {
                 // Clean up container and temporary files
                 sh "docker stop ${CONTAINER_NAME}"
                 sh "docker rm ${CONTAINER_NAME}"
                 sh "rm -f Scores.txt"
-                }
-                cleanWs()
             }
-            success {
-                script {
-                    docker.withRegistry('https://registry.hub.docker.com', 'dockerHubCredentials') {
+            cleanWs()
+        }
+        success {
+            script {
+                docker.withRegistry('https://registry.hub.docker.com', 'dockerHubCredentials') {
                     dockerImage.push("${env.BUILD_ID}")
                     dockerImage.push("latest")
                 }
             }
-            failure {
+        }
+        failure {
+            script {
                 // Implement notification logic here
                 echo 'The build failed'
             }
