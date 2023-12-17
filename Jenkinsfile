@@ -1,5 +1,7 @@
 pipeline {
-    agent any
+    agent {
+        label 'win11-amd64'
+    }
 
     environment {
         IMAGE_NAME = "worldofgames"
@@ -30,8 +32,8 @@ pipeline {
             steps {
                 script {
                     try {
-                        sh "touch Scores.txt"
-                        container = dockerImage.run("-d --name ${CONTAINER_NAME} -p ${PORT}:5000 -v ${pwd()}/Scores.txt:/app/Scores.txt ${IMAGE_NAME}:${env.BUILD_ID}")
+                        bat "type nul > Scores.txt"
+                        container = dockerImage.run("-d --name ${CONTAINER_NAME} -p ${PORT}:5000 -v ${pwd()}\\Scores.txt:/app/Scores.txt ${IMAGE_NAME}:${env.BUILD_ID}")
                     } catch(Exception e) {
                         error "Run failed: ${e.message}"
                     }
@@ -43,7 +45,7 @@ pipeline {
             steps {
                 script {
                     try {
-                        sh 'python e2e.py'
+                        bat 'python e2e.py'
                     } catch(Exception e) {
                         error "Tests failed: ${e.message}"
                     }
@@ -56,9 +58,9 @@ pipeline {
         always {
             script {
                 // Clean up container and temporary files
-                sh "docker stop ${CONTAINER_NAME}"
-                sh "docker rm ${CONTAINER_NAME}"
-                sh "rm -f Scores.txt"
+                bat "docker stop ${CONTAINER_NAME}"
+                bat "docker rm ${CONTAINER_NAME}"
+                bat "del Scores.txt"
             }
             cleanWs()
         }
@@ -72,7 +74,6 @@ pipeline {
         }
         failure {
             script {
-                // Implement notification logic here
                 echo 'The build failed'
             }
         }
