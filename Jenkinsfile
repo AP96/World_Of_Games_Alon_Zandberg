@@ -11,7 +11,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/AP96/World_Of_Games_Alon_Zandberg.git'
+                git branch: 'main', url: 'https://github.com/AP96/World_Of_Games_Alon_Zandberg.git'
             }
         }
         stage('Build') {
