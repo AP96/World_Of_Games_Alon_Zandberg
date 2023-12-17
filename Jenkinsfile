@@ -16,6 +16,7 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/AP96/World_Of_Games_Alon_Zandberg.git'
             }
         }
+
         stage('Build') {
             steps {
                 script {
@@ -37,7 +38,7 @@ pipeline {
                         // Create a new file 'scores.txt'
                         bat "type nul > scores.txt"
                         // Run the new container
-                        container = dockerImage.run("-d --name ${CONTAINER_NAME} -p ${PORT}:5000 -v ${pwd()}\\scores.txt:/app/scores.txt ${IMAGE_NAME}:${env.BUILD_ID}")
+                        docker.run("-d --name ${CONTAINER_NAME} -p ${PORT}:5000 -v ${pwd()}\\scores.txt:/app/scores.txt ${IMAGE_NAME}:${env.BUILD_ID}")
                     } catch(Exception e) {
                         error "Run failed: ${e.message}"
                     }
