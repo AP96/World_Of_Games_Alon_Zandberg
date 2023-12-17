@@ -32,8 +32,8 @@ pipeline {
             steps {
                 script {
                     try {
-                        bat "type nul > Scores.txt"
-                        container = dockerImage.run("-d --name ${CONTAINER_NAME} -p ${PORT}:5000 -v ${pwd()}\\Scores.txt:/app/Scores.txt ${IMAGE_NAME}:${env.BUILD_ID}")
+                        bat "type nul > scores.txt"
+                        container = dockerImage.run("-d --name ${CONTAINER_NAME} -p ${PORT}:5000 -v ${pwd()}\\scores.txt:/app/scores.txt ${IMAGE_NAME}:${env.BUILD_ID}")
                     } catch(Exception e) {
                         error "Run failed: ${e.message}"
                     }
@@ -60,7 +60,8 @@ pipeline {
                 // Clean up container and temporary files
                 bat "docker stop ${CONTAINER_NAME}"
                 bat "docker rm ${CONTAINER_NAME}"
-                bat "del Scores.txt"
+                // Deleting the lowercase 'scores.txt' file
+                bat "del scores.txt"
             }
             cleanWs()
         }
