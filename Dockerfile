@@ -13,7 +13,7 @@ COPY main_score.py /app/main_score.py
 COPY score.py /app/score.py
 COPY utils.py /app/utils.py
 COPY requirements.txt /app/requirements.txt
-COPY Scores.txt /app/Scores.txt
+COPY scores.txt /app/scores.txt
 
 #Install packages specified in the requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
