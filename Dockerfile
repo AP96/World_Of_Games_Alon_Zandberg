@@ -15,6 +15,7 @@ COPY utils.py /app/utils.py
 COPY requirements.txt /app/requirements.txt
 COPY scores.txt /app/scores.txt
 
+
 #Install packages specified in the requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
