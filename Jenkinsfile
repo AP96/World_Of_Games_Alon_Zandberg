@@ -50,6 +50,7 @@ pipeline {
             steps {
                 script {
                     try {
+                        bat 'pip install selenium'
                         bat 'python e2e.py'
                     } catch(Exception e) {
                         error "Tests failed: ${e.message}"
