@@ -8,6 +8,8 @@ pipeline {
         CONTAINER_NAME = "wog_web_app"
         DOCKERHUB_REPO = "azprince/world_of_games"
         PORT = 8777
+        // Define the ChromeDriver version to be compatible with the installed Chrome version
+        CHROME_DRIVER_VERSION = '120.0.6099.62'
     }
 
     stages {
@@ -43,14 +45,22 @@ pipeline {
             }
         }
 
+        stage('Prepare Test Environment') {
+            steps {
+                script {
+                    // Install Selenium and specific ChromeDriver version
+                    bat 'pip install selenium'
+                    bat "pip install chromedriver-binary==${120.0.6099.62}"
+                }
+            }
+        }
+
         stage('Test') {
             steps {
                 script {
                     try {
-                        // Adjusted to the correct path of e2e.py
-                        bat 'pip install selenium'
+                        // Run the e2e test script
                         bat 'python tests\\e2e.py'
-
                     } catch(Exception e) {
                         error "Tests failed: ${e.message}"
                     }
