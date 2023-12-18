@@ -63,8 +63,8 @@ pipeline {
         always {
             script {
                 // Ensure to stop and remove the container in post-execution, irrespective of success or failure
-                bat "docker stop ${CONTAINER_NAME} || true"
-                bat "docker rm ${CONTAINER_NAME} || true"
+                bat "docker stop ${CONTAINER_NAME} || exit 0"
+                bat "docker rm ${CONTAINER_NAME} || exit 0"
                 // Delete the 'scores.txt' file
                 bat "del scores.txt"
             }
