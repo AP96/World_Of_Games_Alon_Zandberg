@@ -50,7 +50,7 @@ pipeline {
                 script {
                     // Install Selenium and specific ChromeDriver version
                     bat 'pip install selenium'
-                    bat "pip install chromedriver-binary==${120.0.6099.62}"
+                    bat "pip install chromedriver-binary==${CHROME_DRIVER_VERSION}"
                 }
             }
         }
