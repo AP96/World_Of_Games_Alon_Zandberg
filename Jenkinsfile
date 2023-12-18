@@ -33,12 +33,9 @@ pipeline {
             steps {
                 script {
                     try {
-                        // Remove any existing container with the same name
-                        bat "docker rm -f ${CONTAINER_NAME} || true"
-                        // Create a new file 'scores.txt'
+                        bat "docker rm -f ${CONTAINER_NAME} || exit 0"
                         bat "type nul > scores.txt"
-                        // Run the new container
-                        docker.run("-d --name ${CONTAINER_NAME} -p ${PORT}:5000 -v ${pwd()}\\scores.txt:/app/scores.txt ${IMAGE_NAME}:${env.BUILD_ID}")
+                        dockerImage.run("-d", "--name ${CONTAINER_NAME}", "-p ${PORT}:5000", "-v ${pwd()}\\scores.txt:/app/scores.txt")
                     } catch(Exception e) {
                         error "Run failed: ${e.message}"
                     }
@@ -62,10 +59,8 @@ pipeline {
     post {
         always {
             script {
-                // Ensure to stop and remove the container in post-execution, irrespective of success or failure
                 bat "docker stop ${CONTAINER_NAME} || exit 0"
                 bat "docker rm ${CONTAINER_NAME} || exit 0"
-                // Delete the 'scores.txt' file
                 bat "del scores.txt"
             }
             cleanWs()
