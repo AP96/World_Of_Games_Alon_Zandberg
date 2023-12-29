@@ -1,5 +1,5 @@
 
-import requests
+import traceback
 from selenium import webdriver
 import sys
 
@@ -26,6 +26,7 @@ def test_scores_service(url):
         return 1 <= score <= 1000
     except Exception as e:
         print(f"Error produced during test execution: {e}")
+        traceback.print_exc()
         return False
     finally:
         driver.quit()
