@@ -8,31 +8,28 @@ pipeline {
         CONTAINER_NAME = "wog_web_app"
         DOCKERHUB_REPO = "azprince/world_of_games"
         PORT = 8777
-        // Define the ChromeDriver version to be compatible with the installed Chrome version
         CHROME_DRIVER_VERSION = '120.0.6099.62'
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/AP96/World_Of_Games_Alon_Zandberg.git'
+                // This stage is managed by Jenkins and does not need explicit steps if it's just a simple Git checkout.
             }
         }
+
         stage('Build') {
             steps {
                 script {
                     try {
-                        bat "docker build -t ${IMAGE_NAME}:${env.BUILD_ID}"
+                        // Corrected the docker build command with the context parameter.
+                        bat "docker build -t ${IMAGE_NAME}:${env.BUILD_ID} ."
                     } catch(Exception e) {
                         error "Build failed: ${e.message}"
                     }
                 }
-
             }
         }
-
-
-
 
         stage('Run') {
             steps {
@@ -51,7 +48,6 @@ pipeline {
         stage('Prepare Test Environment') {
             steps {
                 script {
-                    // Install Selenium and specific ChromeDriver version
                     bat 'pip install selenium'
                     bat "pip install chromedriver-binary==${CHROME_DRIVER_VERSION}"
                 }
@@ -62,7 +58,6 @@ pipeline {
             steps {
                 script {
                     try {
-                        // Run the e2e test script
                         bat 'python tests\\e2e.py'
                     } catch(Exception e) {
                         error "Tests failed: ${e.message}"
@@ -84,6 +79,7 @@ pipeline {
         success {
             script {
                 docker.withRegistry('https://registry.hub.docker.com', 'dockerHubCredentials') {
+                    // Ensure the dockerImage variable is correctly defined in the Build stage for this to work.
                     dockerImage.push("${env.BUILD_ID}")
                     dockerImage.push("latest")
                 }
