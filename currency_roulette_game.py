@@ -14,7 +14,9 @@ def welcome():
 def play(level):
     welcome()
     converter = CurrencyConverter()
+    # Generates a random USD amount and calculates the corresponding ILS interval
     money_interval = get_money_interval(level, random.randint(0, 101), converter)
+    # Captures the player's guess in USD and converts it to ILS
     guess = get_guess_from_user(INPUT_PROMPT, VALID_USER_USD_INPUT_CHOICES, converter)
     comparison = compare_results(guess, money_interval)
     result = "Won" if comparison == 1 else "Lost"

@@ -15,10 +15,12 @@ GAMES_DESCRIPTION_CHOICES = [
 ]
 
 
+# Prints a welcome message to the user
 def welcome(username):
     print(f'Hi {username} and welcome to the World of Games: The Epic Journey')
 
 
+# Main game - selection loop
 def start_play():
     while True:
         print("\nPlease choose a game to play:")
@@ -42,6 +44,9 @@ def start_play():
         utils.screen_cleaner()
 
 
+# Determines which game to play based on the game parameter.
+# Calls the play method of the corresponding game module.
+# Adds score (if the game is won) using score.add_score.
 def play(game, level):
     result = None
     if game == 1:
@@ -54,6 +59,9 @@ def play(game, level):
         score.add_score(level)
 
 
+# Validates user input against a set of valid choices. Prompts the user for input and checks if it is a digit and
+# within the valid choices per nature of choice - Game / Difficulty level Returns the valid input or prompts again in
+# case of invalid input.
 def get_user_choice(prompt, valid_choices, mode):
     while True:
         choice = input(prompt)

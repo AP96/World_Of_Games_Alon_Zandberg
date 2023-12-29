@@ -1,5 +1,5 @@
 # A general purpose python file.
-# This file will contain general information and operations we need for our games.
+# Providing general-purpose functions and constants that can be utilized across different parts of the game.
 
 
 SCORES_FILE_NAME = 'Scores.txt'

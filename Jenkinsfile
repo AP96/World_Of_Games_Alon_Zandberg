@@ -18,18 +18,21 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/AP96/World_Of_Games_Alon_Zandberg.git'
             }
         }
-
         stage('Build') {
             steps {
                 script {
                     try {
-                        dockerImage = docker.build("${IMAGE_NAME}:${env.BUILD_ID}")
+                        bat "docker build -t ${IMAGE_NAME}:${env.BUILD_ID}"
                     } catch(Exception e) {
                         error "Build failed: ${e.message}"
                     }
                 }
+
             }
         }
+
+
+
 
         stage('Run') {
             steps {

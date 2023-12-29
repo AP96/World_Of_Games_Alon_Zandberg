@@ -5,6 +5,7 @@ import sys
 from selenium.webdriver.common.by import By
 
 
+# To test the score service of a web application.
 def test_scores_service(url):
     # Initialize a Chrome Web Driver
     driver = webdriver.Chrome()
