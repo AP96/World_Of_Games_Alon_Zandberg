@@ -3,10 +3,13 @@ from selenium import webdriver
 import sys
 
 from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
 
 
 # To test the score service of a web application.
 def test_scores_service(url):
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
     # Initialize a Chrome Web Driver
     driver = webdriver.Chrome()
     try:
