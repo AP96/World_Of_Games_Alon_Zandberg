@@ -14,10 +14,9 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                // This stage is managed by Jenkins and does not need explicit steps if it's just a simple Git checkout.
+               echo "Checking out the repository - managed by Jenkins"
             }
         }
-
         stage('Build') {
             steps {
                 script {
