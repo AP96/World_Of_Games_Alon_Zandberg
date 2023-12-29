@@ -1,4 +1,3 @@
-from telnetlib import EC
 
 import requests
 from selenium import webdriver
