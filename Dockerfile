@@ -17,7 +17,7 @@ COPY requirements.txt /app/requirements.txt
 COPY scores.txt /app/scores.txt
 
 
-#Install packages specified in the requirements.txt
+#Install packages specified in the requirements.txt to be used by the running image
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Externalize 5000 available to the outside world - Default port for Flask applications

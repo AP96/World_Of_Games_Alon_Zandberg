@@ -1,7 +1,13 @@
 from flask import Flask
+
 app = Flask(__name__)
 
+
 # This server is designed to display the game score stored in a text file
+
+@app.route('/test', methods=['GET'])
+def test():
+    return 'Test Successful'
 
 
 # To handle requests to the /score endpoint
