@@ -17,7 +17,7 @@ services:
     image:  az_worldofgames_level4:latest
     container_name: wog_web_app
     ports:
-      - "5000:5000"
+      - "5001:5000"
     volumes:
       - type: bind
         source: ./scores.txt
