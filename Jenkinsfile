@@ -37,7 +37,7 @@ pipeline {
                     try {
                         bat(script: "docker rm -f ${CONTAINER_NAME} || exit 0", returnStatus: true)
                         bat "type nul > scores.txt"
-                        bat "docker run -d --name ${CONTAINER_NAME} -p ${PORT}:5000 -v ${pwd()}\\scores.txt:/app/scores.txt ${IMAGE_NAME}:${env.BUILD_ID}"
+                        bat "docker run -d --dns 8.8.8.8 --dns 8.8.4.4 --name ${CONTAINER_NAME} -p ${PORT}:5000 -v ${pwd()}\\scores.txt:/app/scores.txt ${IMAGE_NAME}:${env.BUILD_ID}"
                     } catch(Exception e) {
                         error "Run failed: ${e.message}"
                     }
@@ -49,7 +49,7 @@ pipeline {
             steps {
                 script {
                     bat(script: "docker rm -f ${SELENIUM_CONTAINER_NAME} || exit 0", returnStatus: true)
-                    bat "docker run -d -p 4444:4444 --name ${SELENIUM_CONTAINER_NAME} selenium/standalone-chrome:latest"
+                    bat "docker run -d --dns 8.8.8.8 --dns 8.8.4.4 -p 4444:4444 --name ${SELENIUM_CONTAINER_NAME} selenium/standalone-chrome:latest"
                 }
             }
         }
