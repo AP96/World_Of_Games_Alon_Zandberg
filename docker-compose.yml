@@ -1,20 +1,11 @@
 version: '3.8'
 
-# This docker-compose.yml file defines a single service for a Flask web application,
-# detailing how the Docker image for this service should be built & how the Docker container based on the Dockerfile should be run.
-# It includes configurations for building the Docker image, setting up port mappings for web access,
-# persisting data using a bind mount volume, setting environment variables for Flask,
-# and ensuring container resilience through a restart policy.
-
-# The Docker Compose file itself does not directly define the Flask application.
-# Instead, it specifies the mechanics of how to build and run the Docker container that contains your Flask application.
-
 services:
   web:
     build:
       context: .
       dockerfile: Dockerfile
-    image:  az_worldofgames_level4:latest
+    image: az_worldofgames_level4:latest
     container_name: wog_web_app
     ports:
       - "5001:5000"
@@ -22,12 +13,11 @@ services:
       - type: bind
         source: ./scores.txt
         target: /app/scores.txt
-    # Enables development features like debugger and reload on code changes
     environment:
       - FLASK_ENV=development
-    # The container will be restarted if it exits with an error code.
-    # This can help make the application more resilient to crashes or unexpected stops.
     restart: on-failure
+    networks:
+      - app-network
 
   selenium-chrome:
     image: selenium/standalone-chrome:latest
@@ -35,3 +25,9 @@ services:
     ports:
       - "4444:4444"
     restart: on-failure
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

@@ -1,21 +1,23 @@
 import traceback
+import sys
+from selenium import webdriver
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.remote.webdriver import WebDriver
-import sys
 
 
 def test_scores_service(url):
     chrome_options = Options()
     chrome_options.add_argument("--headless")
-    # Connect to Remote WebDriver of Selenium Standalone Chrome
-    driver = WebDriver(command_executor='http://localhost:4444/wd/hub', options=chrome_options)
+    driver = webdriver.Remote(
+        command_executor='http://localhost:4444/wd/hub',
+        options=chrome_options
+    )
 
     try:
         driver.get(url)
-        # Wait until the score element is present in the DOM
         WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.ID, "score"))
         )
