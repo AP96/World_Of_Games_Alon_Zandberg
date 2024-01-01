@@ -33,7 +33,7 @@ def test_scores_service(url):
 
 
 def main_function():
-    application_url = "http://localhost:5001/score"
+    application_url = "http://wog_web_app:5000/score"
     if test_scores_service(application_url):
         print("Test Passed Successfully!")
         sys.exit(0)
