@@ -1,22 +1,18 @@
-
 import traceback
-from selenium import webdriver
-import sys
-
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.remote.webdriver import WebDriver
+import sys
 
 
-# To test the score service of a web application.
 def test_scores_service(url):
     chrome_options = Options()
     chrome_options.add_argument("--headless")
-    # Initialize a Chrome Web Driver
-    driver_path = Service(r'D:\Documents\chromedriver\chomedriver.exe')
-    driver = webdriver.Chrome(service=driver_path, options=chrome_options)
+    # Connect to Remote WebDriver of Selenium Standalone Chrome
+    driver = WebDriver(command_executor='http://localhost:4444/wd/hub', options=chrome_options)
+
     try:
         driver.get(url)
         # Wait until the score element is present in the DOM
@@ -37,10 +33,10 @@ def test_scores_service(url):
 def main_function():
     application_url = "http://localhost:5001/score"
     if test_scores_service(application_url):
-        print("Test Passed Succesfully !")
+        print("Test Passed Successfully!")
         sys.exit(0)
     else:
-        print("Test Failed !")
+        print("Test Failed!")
         sys.exit(-1)
 
 
