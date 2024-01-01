@@ -12,7 +12,7 @@ def test_scores_service(url):
     chrome_options = Options()
     chrome_options.add_argument("--headless")
     driver = webdriver.Remote(
-        command_executor='http://selenium-standalone-chrome:4444/wd/hub',
+        command_executor='http://localhost:4444/wd/hub',
         options=chrome_options
     )
 
@@ -33,7 +33,7 @@ def test_scores_service(url):
 
 
 def main_function():
-    application_url = "http://wog_web_app:5000/score"
+    application_url = "http://localhost:5001/score"
     if test_scores_service(application_url):
         print("Test Passed Successfully!")
         sys.exit(0)
