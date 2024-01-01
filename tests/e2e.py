@@ -5,6 +5,7 @@ import sys
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
@@ -14,7 +15,8 @@ def test_scores_service(url):
     chrome_options = Options()
     chrome_options.add_argument("--headless")
     # Initialize a Chrome Web Driver
-    driver = webdriver.Chrome()
+    driver_path = Service(r'D:\Documents\chromedriver\chomedriver.exe')
+    driver = webdriver.Chrome(service=driver_path, options=chrome_options)
     try:
         driver.get(url)
         # Wait until the score element is present in the DOM
