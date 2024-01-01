@@ -33,7 +33,7 @@ def test_scores_service(url):
 
 
 def main_function():
-    application_url = "http://localhost:5000/score"
+    application_url = "http://localhost:5001/score"
     if test_scores_service(application_url):
         print("Test Passed Succesfully !")
         sys.exit(0)
