@@ -14,7 +14,7 @@ def test_scores_service(url):
     chrome_options = Options()
     chrome_options.add_argument("--headless")
     driver = webdriver.Remote(
-        command_executor='http://localhost:4444/wd/hub',
+        command_executor='http://localhost:4444',
         options=chrome_options
     )
 
