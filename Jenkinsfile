@@ -8,7 +8,7 @@ pipeline {
         CONTAINER_NAME = "wog_web_app"
         PORT = 5001
         SELENIUM_CONTAINER_NAME = "selenium-standalone-chrome"
-        CHROME_DRIVER_VERSION = '120.0.6099.62' // Ensure this is set as per your requirements
+        CHROME_DRIVER_VERSION = '120.0.6099.109' // Ensure this is set as per your requirements
     }
 
     stages {
