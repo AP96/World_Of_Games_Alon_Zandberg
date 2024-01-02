@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 # This server is designed to display the game score stored in a text file
 
-@app.route('/test', methods=['GET'])
+@app.route('/health', methods=['GET'])
 def test():
     return 'Test Successful'
 

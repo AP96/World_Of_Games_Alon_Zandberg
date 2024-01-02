@@ -9,18 +9,11 @@ services:
     container_name: wog_web_app
     ports:
       - "5001:5000"
-    volumes:
-      - type: bind
-        source: ./scores.txt
-        target: /app/scores.txt
     environment:
       - FLASK_ENV=development
     restart: on-failure
     networks:
       - app-network
-    dns:
-      - 8.8.8.8
-      - 8.8.4.4
 
   selenium-chrome:
     image: selenium/standalone-chrome:latest
@@ -30,9 +23,6 @@ services:
     restart: on-failure
     networks:
       - app-network
-    dns:
-      - 8.8.8.8
-      - 8.8.4.4
 
 networks:
   app-network:
