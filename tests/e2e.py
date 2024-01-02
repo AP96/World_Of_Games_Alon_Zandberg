@@ -38,7 +38,7 @@ def test_scores_service(url):
 
 
 def main_function():
-    application_url = "http://localhost:5001/score"
+    application_url = "http://host.docker.internal:5001/score"
     logging.info("Starting the test.")
     if test_scores_service(application_url):
         logging.info("Test Passed Successfully!")
