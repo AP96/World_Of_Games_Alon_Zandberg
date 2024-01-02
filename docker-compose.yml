@@ -16,7 +16,7 @@ services:
       - app-network
 
   selenium-chrome:
-    image: selenium/standalone-chrome:latest
+    image: selenium/standalone-chrome:118.0-chromedriver-118.0-20231016
     container_name: selenium-standalone-chrome
     ports:
       - "4444:4444"
