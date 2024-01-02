@@ -62,7 +62,7 @@ pipeline {
                     // Health check for Selenium server
                     def seleniumHealthy = false
                     for (int i = 0; i < 10; i++) {
-                        if (bat(script: "curl -f http://localhost:${SELENIUM_PORT}/wd/hub", returnStatus: true) == 0) {
+                        if (bat(script: "curl -f http://localhost:${SELENIUM_PORT}", returnStatus: true) == 0) {
                             seleniumHealthy = true
                             break
                         }
