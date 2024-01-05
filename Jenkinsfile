@@ -81,13 +81,14 @@ pipeline {
 
         stage('Push Docker Image') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'USER', passwordVariable: 'PASSWORD')]) {
-                    def registry_url = "registry.docker.io"
-                    bat "docker login -u $USER -p $PASSWORD ${registry_url}"
-                    bat "docker tag ${IMAGE_NAME}:${env.BUILD_ID} ${USER}/world_of_games:${env.BUILD_ID}"
-                    bat "docker push ${USER}/world_of_games:${env.BUILD_ID}"
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'USER', passwordVariable: 'PASSWORD')]) {
+                        def registry_url = "registry.docker.io"
+                        bat "docker login -u $USER -p $PASSWORD ${registry_url}"
+                        bat "docker tag ${IMAGE_NAME}:${env.BUILD_ID} ${USER}/world_of_games:${env.BUILD_ID}"
+                        bat "docker push ${USER}/world_of_games:${env.BUILD_ID}"
+                    }
                 }
-            }
         }
     }
 
