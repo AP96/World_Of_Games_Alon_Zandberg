@@ -82,9 +82,9 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                    def dockerImage = docker.build("${IMAGE_NAME}:${env.BUILD_ID}")
                     docker.withRegistry('https://registry.hub.docker.com', 'docker-hub-credentials') {
-                        dockerImage.push()
+                        bat "docker tag ${IMAGE_NAME}:${env.BUILD_ID} azprince/world_of_games:${env.BUILD_ID}"
+                        bat "docker push azprince/world_of_games:${env.BUILD_ID}"
                     }
                 }
             }
