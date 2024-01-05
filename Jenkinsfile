@@ -40,12 +40,9 @@ pipeline {
             }
         }
 
-        // Removed 'Prepare Test Environment' stage
-
         stage('Test') {
             steps {
                 script {
-                    // Health check for Flask app
                     def appHealthy = false
                     for (int i = 0; i < 10; i++) {
                         if (bat(script: "curl -f http://localhost:${PORT}/health", returnStatus: true) == 0) {
@@ -53,13 +50,12 @@ pipeline {
                             break
                         }
                         echo "Waiting for Flask app to become healthy..."
-                        sleep 5 // Wait for 5 seconds before the next try
+                        sleep 5
                     }
                     if (!appHealthy) {
                         error "Flask app did not start correctly"
                     }
 
-                    // Health check for Selenium server
                     def seleniumHealthy = false
                     for (int i = 0; i < 10; i++) {
                         if (bat(script: "curl -f http://localhost:${SELENIUM_PORT}", returnStatus: true) == 0) {
@@ -67,13 +63,12 @@ pipeline {
                             break
                         }
                         echo "Waiting for Selenium server to become healthy..."
-                        sleep 5 // Wait for 5 seconds before the next try
+                        sleep 5
                     }
                     if (!seleniumHealthy) {
                         error "Selenium server did not start correctly"
                     }
 
-                    // Run tests
                     bat 'python tests\\e2e.py'
                 }
             }
@@ -83,12 +78,12 @@ pipeline {
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'USER', passwordVariable: 'PASSWORD')]) {
-                        def registry_url = "registry.docker.io"
-                        bat "docker login -u $USER -p $PASSWORD ${registry_url}"
+                        bat "docker login -u $USER -p $PASSWORD registry.docker.io"
                         bat "docker tag ${IMAGE_NAME}:${env.BUILD_ID} ${USER}/world_of_games:${env.BUILD_ID}"
                         bat "docker push ${USER}/world_of_games:${env.BUILD_ID}"
                     }
                 }
+            }
         }
     }
 
