@@ -81,15 +81,16 @@ pipeline {
 
         stage('Push Docker Image') {
             steps {
-                script {
-                    docker.withRegistry('https://registry.hub.docker.com', 'docker-hub-credentials') {
-                        bat "docker tag ${IMAGE_NAME}:${env.BUILD_ID} azprince/world_of_games:${env.BUILD_ID}"
-                        bat "docker push azprince/world_of_games:${env.BUILD_ID}"
+                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'USER', passwordVariable: 'PASSWORD')]) {
+                    def registry_url = "registry.docker.io/"
+                    bat "docker login -u $USER -p $PASSWORD ${registry_url}"
+                    docker.withRegistry("http://${registry_url}", "docker-hub-credentials") {
+                            bat "docker push ${USER}/world_of_games:${env.BUILD_ID}"
+                        }
                     }
                 }
             }
         }
-
 
     }
 
