@@ -28,6 +28,7 @@ pipeline {
 
         stage('Run Application') {
             steps {
+                bat(script: "docker stop ${CONTAINER_NAME} || exit 0", returnStatus: true)
                 bat(script: "docker rm -f ${CONTAINER_NAME} || exit 0", returnStatus: true)
                 bat "docker run -d --name ${CONTAINER_NAME} -p ${PORT}:5000 ${IMAGE_NAME}:${env.BUILD_ID}"
             }
@@ -35,6 +36,7 @@ pipeline {
 
         stage('Run Selenium') {
             steps {
+                bat(script: "docker stop ${SELENIUM_CONTAINER_NAME} || exit 0", returnStatus: true)
                 bat(script: "docker rm -f ${SELENIUM_CONTAINER_NAME} || exit 0", returnStatus: true)
                 bat "docker run -d -p ${SELENIUM_PORT}:4444 --name ${SELENIUM_CONTAINER_NAME} selenium/standalone-chrome:latest"
             }
