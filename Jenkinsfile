@@ -27,16 +27,16 @@ pipeline {
 
         stage('Run Application') {
             steps {
-                bat "docker stop ${CONTAINER_NAME} || true"
-                bat "docker rm -f ${CONTAINER_NAME} || true"
+                bat "docker stop ${CONTAINER_NAME} || exit 0"
+                bat "docker rm -f ${CONTAINER_NAME} || exit 0"
                 bat "docker run -d --name ${CONTAINER_NAME} -p ${PORT}:5000 ${IMAGE_NAME}:${env.BUILD_ID}"
             }
         }
 
         stage('Run Selenium') {
             steps {
-                bat "docker stop ${SELENIUM_CONTAINER_NAME} || true"
-                bat "docker rm -f ${SELENIUM_CONTAINER_NAME} || true"
+                bat "docker stop ${SELENIUM_CONTAINER_NAME} || exit 0"
+                bat "docker rm -f ${SELENIUM_CONTAINER_NAME} || exit 0"
                 bat "docker run -d -p ${SELENIUM_PORT}:4444 --name ${SELENIUM_CONTAINER_NAME} selenium/standalone-chrome:latest"
             }
         }
@@ -66,10 +66,10 @@ pipeline {
 
     post {
         always {
-            bat "docker stop ${CONTAINER_NAME} || true"
-            bat "docker rm ${CONTAINER_NAME} || true"
-            bat "docker stop ${SELENIUM_CONTAINER_NAME} || true"
-            bat "docker rm ${SELENIUM_CONTAINER_NAME} || true"
+            bat "docker stop ${CONTAINER_NAME} || exit 0"
+            bat "docker rm ${CONTAINER_NAME} || exit 0"
+            bat "docker stop ${SELENIUM_CONTAINER_NAME} || exit 0"
+            bat "docker rm ${SELENIUM_CONTAINER_NAME} || exit 0"
             cleanWs()
         }
         failure {
