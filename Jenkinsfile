@@ -18,6 +18,7 @@ pipeline {
             steps {
                 echo "Checking out the repository - managed by Jenkins"
                 checkout scm
+                bat "dir"  // Verify files are checked out
             }
         }
 
