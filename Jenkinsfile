@@ -75,7 +75,7 @@ def runHealthChecks() {
 
 def checkHealth(port, service) {
     def healthy = false
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 20; i++) {
         if (bat(script: "curl -f http://localhost:${port}/health", returnStatus: true) == 0) {
             healthy = true
             break
