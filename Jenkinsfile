@@ -14,12 +14,6 @@ pipeline {
     }
 
     stages {
-        stage('Clean Workspace') {
-            steps {
-                cleanWs() // Cleans the workspace before starting the build
-            }
-        }
-
         stage('Checkout') {
             steps {
                 echo "Checking out the repository - managed by Jenkins"
@@ -31,7 +25,11 @@ pipeline {
             steps {
                 script {
                     try {
+                        echo "Current Directory:"
+                        bat "cd"  // Prints the current directory in Windows
+                        echo "Directory Contents:"
                         bat "dir"  // Lists the contents of the current directory in Windows
+                        echo "Building Docker Image:"
                         bat "docker build -t ${IMAGE_NAME}:${env.BUILD_ID} ."
                     } catch(Exception e) {
                         error "Build failed: ${e.message}"
@@ -115,6 +113,7 @@ pipeline {
                 bat(script: "docker rm ${CONTAINER_NAME} || exit 0", returnStatus: true)
                 bat(script: "docker stop ${SELENIUM_CONTAINER_NAME} || exit 0", returnStatus: true)
                 bat(script: "docker rm ${SELENIUM_CONTAINER_NAME} || exit 0", returnStatus: true)
+                echo "Cleaning up the workspace"
                 cleanWs() // Cleans the workspace after the build is completed
             }
         }
