@@ -7,7 +7,7 @@ pipeline {
         IMAGE_NAME = "worldofgames"
         CONTAINER_NAME = "wog_web_app"
         DOCKERHUB_REPO = "azprince/world_of_games"
-        PORT = 5000
+        PORT = 5001
         CHROME_DRIVER_VERSION = '120.0.6099.62'
     }
 
