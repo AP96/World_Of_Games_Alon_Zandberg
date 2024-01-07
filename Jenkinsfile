@@ -8,15 +8,19 @@ pipeline {
         CONTAINER_NAME = "wog_web_app"
         DOCKERHUB_REPO = "azprince/world_of_games"
         PORT = 5001
-        CHROME_DRIVER_VERSION = '120.0.6099.62'
+        SELENIUM_CONTAINER_NAME = "selenium-standalone-chrome"
+        SELENIUM_PORT = 4444 // Port for Selenium server
+        CHROME_DRIVER_VERSION = '120.0.6099.62' // Updated to match the first Jenkinsfile
     }
 
     stages {
         stage('Checkout') {
             steps {
-               echo "Checking out the repository - managed by Jenkins"
+                echo "Checking out the repository - managed by Jenkins"
+                checkout scm
             }
         }
+
         stage('Build') {
             steps {
                 script {
@@ -29,25 +33,28 @@ pipeline {
             }
         }
 
-        stage('Run') {
+        stage('Run Application') {
             steps {
                 script {
                     try {
                         bat(script: "docker rm -f ${CONTAINER_NAME} || exit 0", returnStatus: true)
-                        bat "type nul > scores.txt"
-                        bat "docker run -d --name ${CONTAINER_NAME} -p 5001:5000 -v ${pwd()}\\scores.txt:/app/scores.txt ${IMAGE_NAME}:${env.BUILD_ID}"
+                        bat "docker run -d --name ${CONTAINER_NAME} -p ${PORT}:5000 ${IMAGE_NAME}:${env.BUILD_ID}"
                     } catch(Exception e) {
-                        error "Run failed: ${e.message}"
+                        error "Run Application failed: ${e.message}"
                     }
                 }
             }
         }
 
-        stage('Prepare Test Environment') {
+        stage('Run Selenium') {
             steps {
                 script {
-                    bat 'pip install selenium'
-                    bat "pip install chromedriver-binary==${CHROME_DRIVER_VERSION}"
+                    try {
+                        bat(script: "docker rm -f ${SELENIUM_CONTAINER_NAME} || exit 0", returnStatus: true)
+                        bat "docker run -d -p ${SELENIUM_PORT}:4444 --name ${SELENIUM_CONTAINER_NAME} selenium/standalone-chrome:latest"
+                    } catch(Exception e) {
+                        error "Run Selenium failed: ${e.message}"
+                    }
                 }
             }
         }
@@ -55,6 +62,35 @@ pipeline {
         stage('Test') {
             steps {
                 script {
+                    // Health check for Flask app
+                    def appHealthy = false
+                    for (int i = 0; i < 10; i++) {
+                        if (bat(script: "curl -f http://localhost:${PORT}/health", returnStatus: true) == 0) {
+                            appHealthy = true
+                            break
+                        }
+                        echo "Waiting for Flask app to become healthy..."
+                        sleep 5 // Wait for 5 seconds before the next try
+                    }
+                    if (!appHealthy) {
+                        error "Flask app did not start correctly"
+                    }
+
+                    // Health check for Selenium server
+                    def seleniumHealthy = false
+                    for (int i = 0; i < 10; i++) {
+                        if (bat(script: "curl -f http://localhost:${SELENIUM_PORT}", returnStatus: true) == 0) {
+                            seleniumHealthy = true
+                            break
+                        }
+                        echo "Waiting for Selenium server to become healthy..."
+                        sleep 5 // Wait for 5 seconds before the next try
+                    }
+                    if (!seleniumHealthy) {
+                        error "Selenium server did not start correctly"
+                    }
+
+                    // Run tests
                     try {
                         bat 'python tests\\e2e.py'
                     } catch(Exception e) {
@@ -70,12 +106,14 @@ pipeline {
             script {
                 bat(script: "docker stop ${CONTAINER_NAME} || exit 0", returnStatus: true)
                 bat(script: "docker rm ${CONTAINER_NAME} || exit 0", returnStatus: true)
-                bat "del scores.txt"
+                bat(script: "docker stop ${SELENIUM_CONTAINER_NAME} || exit 0", returnStatus: true)
+                bat(script: "docker rm ${SELENIUM_CONTAINER_NAME} || exit 0", returnStatus: true)
+                cleanWs()
             }
-            cleanWs()
         }
         success {
             script {
+                def dockerImage = docker.build("${DOCKERHUB_REPO}:${env.BUILD_ID}", ".")
                 docker.withRegistry('https://registry.hub.docker.com', 'dockerHubCredentials') {
                     dockerImage.push("${env.BUILD_ID}")
                     dockerImage.push("latest")
@@ -83,9 +121,7 @@ pipeline {
             }
         }
         failure {
-            script {
-                echo 'The build failed'
-            }
+            echo 'The build failed'
         }
     }
 }
