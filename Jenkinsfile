@@ -122,7 +122,7 @@ pipeline {
             script {
                 echo "Listing Workspace Directory Contents:"
                 bat "dir"
-                docker.withRegistry('https://registry.hub.docker.com', 'dockerHubCredentials') {
+                docker.withRegistry('https://registry.hub.docker.com', 'docker-hub-credentials') {
                     def dockerImage = docker.build("${DOCKERHUB_REPO}:${env.BUILD_ID}")
                     dockerImage.push("${env.BUILD_ID}")
                     dockerImage.push("latest")
