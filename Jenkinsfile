@@ -122,7 +122,6 @@ pipeline {
             script {
                 echo "Listing Workspace Directory Contents:"
                 bat "dir"
-                bat "docker build -t ${DOCKERHUB_REPO}:${env.BUILD_ID} . --no-cache"
                 docker.withRegistry('https://registry.hub.docker.com', 'dockerHubCredentials') {
                     def dockerImage = docker.build("${DOCKERHUB_REPO}:${env.BUILD_ID}")
                     dockerImage.push("${env.BUILD_ID}")
