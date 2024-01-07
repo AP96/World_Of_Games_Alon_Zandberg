@@ -5,9 +5,9 @@ pipeline {
         IMAGE_NAME = 'worldofgames'
         CONTAINER_NAME = 'wog_web_app'
         DOCKERHUB_REPO = 'azprince/world_of_games'
-        PORT = 5001
+        PORT = '5001'
         SELENIUM_CONTAINER_NAME = 'selenium-standalone-chrome'
-        SELENIUM_PORT = 4444
+        SELENIUM_PORT = '4444'
     }
 
     stages {
@@ -21,44 +21,32 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    try {
-                        bat "docker build -t ${IMAGE_NAME}:${env.BUILD_ID} . --no-cache"
-                    } catch (Exception e) {
-                        error "Build failed: ${e.message}"
-                    }
+                    bat "docker build -t ${IMAGE_NAME}:${env.BUILD_ID} . --no-cache"
                 }
             }
         }
 
         stage('Run Application and Selenium') {
             steps {
-                script {
-                    containerOperations('start')
-                }
+                containerOperations('start')
             }
         }
 
         stage('Test') {
             steps {
-                script {
-                    runHealthChecks()
-                    runTests()
-                }
+                runHealthChecks()
+                runTests()
             }
         }
     }
 
     post {
         always {
-            script {
-                containerOperations('stop')
-                cleanWorkspace()
-            }
+            containerOperations('stop')
+            cleanWorkspace()
         }
         success {
-            script {
-                dockerPush()
-            }
+            dockerPush()
         }
         failure {
             echo 'The build failed'
@@ -68,21 +56,21 @@ pipeline {
 
 def containerOperations(operation) {
     if (operation == 'start') {
-        bat "docker rm -f ${CONTAINER_NAME} || exit 0"
+        bat "docker rm -f ${CONTAINER_NAME} || true"
         bat "docker run -d --name ${CONTAINER_NAME} -p ${PORT}:5000 ${IMAGE_NAME}:${env.BUILD_ID}"
-        bat "docker rm -f ${SELENIUM_CONTAINER_NAME} || exit 0"
+        bat "docker rm -f ${SELENIUM_CONTAINER_NAME} || true"
         bat "docker run -d -p ${SELENIUM_PORT}:4444 --name ${SELENIUM_CONTAINER_NAME} selenium/standalone-chrome:latest"
     } else if (operation == 'stop') {
-        bat "docker stop ${CONTAINER_NAME} || exit 0"
-        bat "docker rm ${CONTAINER_NAME} || exit 0"
-        bat "docker stop ${SELENIUM_CONTAINER_NAME} || exit 0"
-        bat "docker rm ${SELENIUM_CONTAINER_NAME} || exit 0"
+        bat "docker stop ${CONTAINER_NAME} || true"
+        bat "docker rm ${CONTAINER_NAME} || true"
+        bat "docker stop ${SELENIUM_CONTAINER_NAME} || true"
+        bat "docker rm ${SELENIUM_CONTAINER_NAME} || true"
     }
 }
 
 def runHealthChecks() {
-    checkHealth('${PORT}', 'Flask app')
-    checkHealth('${SELENIUM_PORT}', 'Selenium server')
+    checkHealth(env.PORT, 'Flask app')
+    checkHealth(env.SELENIUM_PORT, 'Selenium server')
 }
 
 def checkHealth(port, service) {
@@ -99,23 +87,16 @@ def checkHealth(port, service) {
 }
 
 def runTests() {
-    try {
-        bat 'python tests\\e2e.py'
-    } catch (Exception e) {
-        error "Tests failed: ${e.message}"
-    }
+    bat 'python tests\\e2e.py'
 }
 
 def dockerPush() {
     bat "docker build -t ${DOCKERHUB_REPO}:${env.BUILD_ID} -f ${WORKSPACE}/Dockerfile ${WORKSPACE} --no-cache"
     docker.withRegistry('https://registry.hub.docker.com', 'dockerHubCredentials') {
-        def dockerImage = docker.build("${DOCKERHUB_REPO}:${env.BUILD_ID}")
-        dockerImage.push("${env.BUILD_ID}")
-        dockerImage.push("latest")
+        docker.build("${DOCKERHUB_REPO}:${env.BUILD_ID}").push()
     }
 }
 
 def cleanWorkspace() {
-    echo "Cleaning up the workspace"
     cleanWs()
 }
