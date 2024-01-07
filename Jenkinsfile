@@ -119,7 +119,7 @@ pipeline {
         }
         success {
             script {
-                bat "docker build -t ${DOCKERHUB_REPO}:${env.BUILD_ID} -f ${WORKSPACE}/Dockerfile ${WORKSPACE} --no-cache"
+                bat "docker build -t ${DOCKERHUB_REPO}:${env.BUILD_ID} . --no-cache"
                 docker.withRegistry('https://registry.hub.docker.com', 'dockerHubCredentials') {
                     def dockerImage = docker.build("${DOCKERHUB_REPO}:${env.BUILD_ID}")
                     dockerImage.push("${env.BUILD_ID}")
