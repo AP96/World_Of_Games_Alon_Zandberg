@@ -30,7 +30,7 @@ pipeline {
                         echo "Directory Contents:"
                         bat "dir"  // Lists the contents of the current directory in Windows
                         echo "Building Docker Image:"
-                        bat "docker build -t ${IMAGE_NAME}:${env.BUILD_ID} ."
+                        bat "docker build -t ${IMAGE_NAME}:${env.BUILD_ID} . --no-cache"
                     } catch(Exception e) {
                         error "Build failed: ${e.message}"
                     }
