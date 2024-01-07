@@ -120,6 +120,7 @@ pipeline {
         success {
             script {
                 // Updated to use the WORKSPACE environment variable
+                echo "Workspace directory: ${WORKSPACE}"
                 bat "docker build -t ${DOCKERHUB_REPO}:${env.BUILD_ID} -f ${WORKSPACE}/Dockerfile ${WORKSPACE} --no-cache"
                 docker.withRegistry('https://registry.hub.docker.com', 'dockerHubCredentials') {
                     def dockerImage = docker.build("${DOCKERHUB_REPO}:${env.BUILD_ID}")
