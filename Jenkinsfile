@@ -116,7 +116,12 @@ pipeline {
                 bat(script: "docker rm ${SELENIUM_CONTAINER_NAME} || exit 0", returnStatus: true)
             }
             echo "Cleaning up the workspace"
-            cleanWs() // Cleans the workspace after the build is completed
+            echo "Cleaning up the workspace"
+            // Selective cleanup
+            cleanWs(notFailBuild: true, deleteDirs: true, patterns: [
+                '**/file.html',
+                '**/scores.txt',
+            ])
         }
         success {
             script {
