@@ -1,7 +1,5 @@
 pipeline {
-    agent {
-        label 'win11-amd64'
-    }
+    agent { label 'win11-amd64' }
 
     environment {
         IMAGE_NAME = "worldofgames"
@@ -9,16 +7,14 @@ pipeline {
         DOCKERHUB_REPO = "azprince/world_of_games"
         PORT = 5001
         SELENIUM_CONTAINER_NAME = "selenium-standalone-chrome"
-        SELENIUM_PORT = 4444 // Port for Selenium server
-        CHROME_DRIVER_VERSION = '120.0.6099.62' // Updated to match the first Jenkinsfile
+        SELENIUM_PORT = 4444
     }
 
     stages {
         stage('Checkout') {
             steps {
-                echo "Checking out the repository - managed by Jenkins"
+                echo "Checking out the repository"
                 checkout scm
-                bat "dir"  // Verify files are checked out
             }
         }
 
@@ -26,13 +22,8 @@ pipeline {
             steps {
                 script {
                     try {
-                        echo "Current Directory:"
-                        bat "cd"  // Prints the current directory in Windows
-                        echo "Directory Contents:"
-                        bat "dir"  // Lists the contents of the current directory in Windows
-                        echo "Building Docker Image:"
                         bat "docker build -t ${IMAGE_NAME}:${env.BUILD_ID} . --no-cache"
-                    } catch(Exception e) {
+                    } catch (Exception e) {
                         error "Build failed: ${e.message}"
                     }
                 }
@@ -42,12 +33,8 @@ pipeline {
         stage('Run Application') {
             steps {
                 script {
-                    try {
-                        bat(script: "docker rm -f ${CONTAINER_NAME} || exit 0", returnStatus: true)
-                        bat "docker run -d --name ${CONTAINER_NAME} -p ${PORT}:5000 ${IMAGE_NAME}:${env.BUILD_ID}"
-                    } catch(Exception e) {
-                        error "Run Application failed: ${e.message}"
-                    }
+                    bat "docker rm -f ${CONTAINER_NAME} || exit 0"
+                    bat "docker run -d --name ${CONTAINER_NAME} -p ${PORT}:5000 ${IMAGE_NAME}:${env.BUILD_ID}"
                 }
             }
         }
@@ -55,12 +42,8 @@ pipeline {
         stage('Run Selenium') {
             steps {
                 script {
-                    try {
-                        bat(script: "docker rm -f ${SELENIUM_CONTAINER_NAME} || exit 0", returnStatus: true)
-                        bat "docker run -d -p ${SELENIUM_PORT}:4444 --name ${SELENIUM_CONTAINER_NAME} selenium/standalone-chrome:latest"
-                    } catch(Exception e) {
-                        error "Run Selenium failed: ${e.message}"
-                    }
+                    bat "docker rm -f ${SELENIUM_CONTAINER_NAME} || exit 0"
+                    bat "docker run -d -p ${SELENIUM_PORT}:4444 --name ${SELENIUM_CONTAINER_NAME} selenium/standalone-chrome:latest"
                 }
             }
         }
@@ -68,38 +51,25 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    // Health check for Flask app
                     def appHealthy = false
-                    for (int i = 0; i < 10; i++) {
-                        if (bat(script: "curl -f http://localhost:${PORT}/health", returnStatus: true) == 0) {
-                            appHealthy = true
-                            break
-                        }
-                        echo "Waiting for Flask app to become healthy..."
-                        sleep 5 // Wait for 5 seconds before the next try
-                    }
-                    if (!appHealthy) {
-                        error "Flask app did not start correctly"
-                    }
-
-                    // Health check for Selenium server
                     def seleniumHealthy = false
-                    for (int i = 0; i < 10; i++) {
-                        if (bat(script: "curl -f http://localhost:${SELENIUM_PORT}", returnStatus: true) == 0) {
-                            seleniumHealthy = true
-                            break
-                        }
-                        echo "Waiting for Selenium server to become healthy..."
-                        sleep 5 // Wait for 5 seconds before the next try
-                    }
-                    if (!seleniumHealthy) {
-                        error "Selenium server did not start correctly"
-                    }
 
-                    // Run tests
+                    (1..10).each {
+                        if (!appHealthy && bat(script: "curl -f http://localhost:${PORT}/health", returnStatus: true) == 0) {
+                            appHealthy = true
+                        }
+                        if (!seleniumHealthy && bat(script: "curl -f http://localhost:${SELENIUM_PORT}", returnStatus: true) == 0) {
+                            seleniumHealthy = true
+                        }
+                        if (appHealthy && seleniumHealthy) break
+                        sleep 5
+                    }
+                    if (!appHealthy) error "Flask app did not start correctly"
+                    if (!seleniumHealthy) error "Selenium server did not start correctly"
+
                     try {
                         bat 'python tests\\e2e.py'
-                    } catch(Exception e) {
+                    } catch (Exception e) {
                         error "Tests failed: ${e.message}"
                     }
                 }
@@ -109,18 +79,14 @@ pipeline {
 
     post {
         always {
-            script {
-                bat(script: "docker stop ${CONTAINER_NAME} || exit 0", returnStatus: true)
-                bat(script: "docker rm ${CONTAINER_NAME} || exit 0", returnStatus: true)
-                bat(script: "docker stop ${SELENIUM_CONTAINER_NAME} || exit 0", returnStatus: true)
-                bat(script: "docker rm ${SELENIUM_CONTAINER_NAME} || exit 0", returnStatus: true)
-            }
-            echo "Post build actions completed"
+            bat "docker stop ${CONTAINER_NAME} || exit 0"
+            bat "docker rm ${CONTAINER_NAME} || exit 0"
+            bat "docker stop ${SELENIUM_CONTAINER_NAME} || exit 0"
+            bat "docker rm ${SELENIUM_CONTAINER_NAME} || exit 0"
+            echo "Post-build actions completed"
         }
         success {
             script {
-                echo "Listing Workspace Directory Contents:"
-                bat "dir"
                 docker.withRegistry('https://registry.hub.docker.com', 'docker-hub-credentials') {
                     def dockerImage = docker.build("${DOCKERHUB_REPO}:${env.BUILD_ID}")
                     dockerImage.push("${env.BUILD_ID}")
