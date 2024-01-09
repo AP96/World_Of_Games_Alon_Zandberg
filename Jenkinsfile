@@ -128,6 +128,7 @@ pipeline {
                 }
             }
         }
+
         failure {
             echo 'The build failed'
         }
