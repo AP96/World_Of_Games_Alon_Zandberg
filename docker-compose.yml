@@ -14,6 +14,10 @@ services:
     restart: on-failure
     networks:
       - app-network
+    volumes:
+      - type: bind
+        source: ./scores.txt
+        target: /app/scores.txt
 
   selenium-chrome:
     image: selenium/standalone-chrome:118.0-chromedriver-118.0-20231016
